@@ -1,0 +1,31 @@
+not -> nand(#0, 1)
+
+and -> not(nand(#0, #1))
+
+writeln(and(1, 1))
+
+writeln(and(0, 1))
+writeln(and(0, 0))
+writeln(and(1, 0))
+writeln()
+
+isPrime -> if(
+    int(le(#0, mul(#1, #1))), 
+    1,
+    if (int(not(mod(int(#0), int(#1)))),
+        0,
+        isPrime(#0, add(#1, 1))
+    )
+)
+
+filterPrimes -> if(int(length(#0)), if(
+    int(isPrime(head(#0), int(2))),
+    concat([head(#0)], filterPrimes(tail(#0))),
+    filterPrimes(tail(#0))), []
+)
+
+fn -> concat([head(#0)], #1)
+
+allPrimes -> filterPrimes(list(2, 1, 1))
+writeln(allPrimes())
+
