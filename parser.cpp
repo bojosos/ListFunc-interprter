@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 char Parser::Peek() const
 {
@@ -27,6 +28,7 @@ ProgramNode* Parser::ParseProgram(const std::string& text)
 
     std::vector<FunctionDecl*> decls;
     std::vector<Node*> nodes;
+    std::vector<ModuleNode*> modules;
     while (m_Pos < m_Text.size())
     {
         SkipWhile(isspace);
@@ -44,13 +46,40 @@ ProgramNode* Parser::ParseProgram(const std::string& text)
             }
             m_Pos = oldPos;
         }
-        nodes.push_back(ParseExpression());
+        Node* node = ParseExpression();
+        if (node->nodeType == NodeType::Module)
+        {
+            ModuleNode* moduleNode = static_cast<ModuleNode*>(node);
+            std::string moduleName = moduleNode->moduleName + ".lfn";
+            std::ifstream input(moduleName, std::ios::ate);
+            if (!input.is_open())
+            {
+                std::cout << "Module " << moduleNode->moduleName << " not found." << std::endl;
+                continue;
+            }
+            size_t size = input.tellg();
+            input.seekg(0);
+            std::string data;
+            data.resize(size);
+            input.read(&data[0], size);
+
+            Parser parser;
+            ProgramNode* moduleProgram = parser.ParseProgram(data);
+            if (moduleProgram != nullptr)
+            {
+                moduleNode->moduleNode = moduleProgram;
+                modules.push_back(moduleNode);
+            }
+        }
+        else
+            nodes.push_back(node);
         SkipWhile(isspace);
     }
 
     ProgramNode* programNode = new ProgramNode();
     programNode->functionDeclarations = std::move(decls);
     programNode->nodes = std::move(nodes);
+    programNode->modules = std::move(modules);
     return programNode;
 }
 
@@ -73,18 +102,34 @@ Node* Parser::ParseExpression()
         return ParseRealLiteral();
     else if (std::isalpha(Peek()))
         return ParseFunctionCall();
-    else if (m_InsideFunctionBody && Peek() == '#')
+    else if (Peek() == '#')
     {
-        Advance();
-        std::string val;
-        while (isdigit(Peek()))
+        if (m_InsideFunctionBody) // arg
         {
-            val += Peek();
             Advance();
+            std::string val;
+            while (isdigit(Peek()))
+            {
+                val += Peek();
+                Advance();
+            }
+            ArgId* argid = new ArgId();
+            argid->value = (uint8_t)std::stoul(val);
+            return argid;
         }
-        ArgId* argid = new ArgId();
-        argid->value = (uint8_t)std::stoul(val);
-        return argid;
+        else // otherwise module
+        {
+            Advance();
+            std::string moduleName;
+            while (isalnum(Peek()))
+            {
+                moduleName += Peek();
+                Advance();
+            }
+            ModuleNode* moduleNode = new ModuleNode();
+            moduleNode->moduleName = moduleName;
+            return moduleNode;
+        }
     }
     // std::cout << m_InsideFunctionBody << " " << m_Pos << std::endl;
     // std::cout << Peek() << std::endl;
@@ -163,14 +208,12 @@ FunctionCall* Parser::ParseFunctionCall()
 
 FunctionDecl* Parser::ParseFunctionDecl()
 {
-    std::cout << "Parse" << std::endl;
     std::string funcName;
     while (isalnum(Peek()))
     {
         funcName += Peek();
         Advance();
     }
-    std::cout << funcName << std::endl;
     
     SkipWhile(isspace);
     if (Peek() != '-') // error
@@ -180,7 +223,6 @@ FunctionDecl* Parser::ParseFunctionDecl()
         void();
     Advance();
     SkipWhile(isspace);
-    // std::cout << m_Text.data() + m_Pos << std::endl;
     FunctionDecl* funcDecl = new FunctionDecl();
     funcDecl->functionName = funcName;
     m_InsideFunctionBody = true;

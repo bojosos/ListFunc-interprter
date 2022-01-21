@@ -28,15 +28,25 @@ Interpreter::Interpreter()
     m_LibraryFunctions["sqrt"] = Library::Sqrt;
 }
 
-Node* Interpreter::Evaluate(Node* node, uint32_t elementCount)
+Node* Interpreter::Evaluate(Node* node)
 {
     switch (node->nodeType)
     {
     case NodeType::Program:
     {
         ProgramNode* program = static_cast<ProgramNode*>(node);
+        // add imported functions
+        for (ModuleNode* decl : program->modules)
+        {
+            for (FunctionDecl* decl : decl->moduleNode->functionDeclarations)
+                m_SymbolTable[decl->functionName] = decl;
+        }
+
+        // add functions from current module
         for (FunctionDecl* decl : program->functionDeclarations)
             m_SymbolTable[decl->functionName] = decl;
+
+        // add function calls
         for (Node* node : program->nodes)
             Evaluate(node);
         return nullptr; // TODO: return status code
@@ -72,7 +82,7 @@ Node* Interpreter::Evaluate(Node* node, uint32_t elementCount)
             Node* result = Evaluate(iterFind->second->body);
             // std::cout << t << result->nodeType << " ";
             // Parser::PrintNode(result);
-            std::cout <<  std::endl;
+            // std::cout <<  std::endl;
             m_Indent -= 1;
             m_Arguments.pop();
             m_ArgumentNames.pop();
@@ -110,7 +120,6 @@ Node* Interpreter::Evaluate(Node* node, uint32_t elementCount)
     {
         ArgId* argid = static_cast<ArgId*>(node);
         // std::cout << "Argid: " << argid->value << std::endl;
-        std::cout << "Current layer: " << m_ArgumentNames.top() << std::endl;
         return m_Arguments.top()[argid->value];
         // return Evaluate(m_Arguments.top()[argid->value]);
     }

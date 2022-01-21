@@ -1,24 +1,6 @@
-not -> nand(#0, 1)
+#library
 
-and -> not(nand(#0, #1))
-
-writeln(and(1, 1))
-
-writeln(and(0, 1))
-writeln(and(0, 0))
-writeln(and(1, 0))
-writeln()
-
-isPrime -> if(
-    int(le(#0, mul(#1, #1))), 
-    1,
-    if (int(not(mod(int(#0), int(#1)))),
-        0,
-        isPrime(#0, add(#1, 1))
-    )
-)
-
-filterPrimes -> if(int(length(#0)), if(
+filterPrimes -> if(length(#0), if(
     int(isPrime(head(#0), int(2))),
     concat([head(#0)], filterPrimes(tail(#0))),
     filterPrimes(tail(#0))), []
@@ -29,3 +11,23 @@ fn -> concat([head(#0)], #1)
 allPrimes -> filterPrimes(list(2, 1, 1))
 writeln(allPrimes())
 
+take -> if (not(#0), [], if (empty(#1), [],
+    concat([head(#1)], take(sub(#0, 1), tail(#1)))
+))
+
+insertionSort -> if (empty(#0), [], insert(head(#0), insertionSort(tail(#0))))
+insert -> if(empty(#1),
+             [#0],
+                if(leq(#0, head(#1)),
+                    concat([#0], #1),
+                    concat([head(#1)], insert(#0, tail(#1)))
+                )
+)
+
+writeln(insertionSort(concat([51 6 1 9 5], list(1,2,10))))
+
+elem -> if(empty(#1), 0, or(eq(#0, head(#1)), elem(#0, tail(#1))))
+
+sum -> if(empty(#0), 0, add(head(#0), sum(tail(#0))))
+
+writeln(elem(1, list(1,1,5)))

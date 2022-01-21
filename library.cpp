@@ -8,9 +8,38 @@
 Node* Library::Equals(const std::vector<Node*>& args, Interpreter* interpreter)
 {
     assert(args.size() == 2);
-    IntNode* node = new IntNode();
-    node->value = static_cast<IntNode*>(interpreter->Evaluate(args[0]))->value == static_cast<IntNode*>(interpreter->Evaluate(args[1]))->value;
-    return node;
+    Node* l = interpreter->Evaluate(args[0]);
+    Node* r = interpreter->Evaluate(args[1]);
+    if (l->nodeType == NodeType::IntLiteral)
+    {
+        if (r->nodeType == NodeType::IntLiteral)
+        {
+            IntNode* result = new IntNode();
+            result->value = static_cast<IntNode*>(l)->value == static_cast<IntNode*>(r)->value;
+            return result;
+        }
+        else
+        {
+            IntNode* result = new IntNode();
+            result->value = static_cast<IntNode*>(l)->value == static_cast<FloatNode*>(r)->value;
+            return result;
+        }
+    }
+    else
+    {
+        if (r->nodeType == NodeType::IntLiteral)
+        {
+            IntNode* result = new IntNode();
+            result->value = static_cast<FloatNode*>(l)->value == static_cast<IntNode*>(r)->value;
+            return result;
+        }
+        else
+        {
+            IntNode* result = new IntNode();
+            result->value = static_cast<FloatNode*>(l)->value == static_cast<FloatNode*>(r)->value;
+            return result;
+        }
+    }
 }
 
 Node* Library::Less(const std::vector<Node*>& args, Interpreter* interpreter)
@@ -28,7 +57,7 @@ Node* Library::Less(const std::vector<Node*>& args, Interpreter* interpreter)
         }
         else
         {
-            FloatNode* result = new FloatNode();
+            IntNode* result = new IntNode();
             result->value = static_cast<IntNode*>(l)->value < static_cast<FloatNode*>(r)->value;
             return result;
         }
@@ -37,13 +66,13 @@ Node* Library::Less(const std::vector<Node*>& args, Interpreter* interpreter)
     {
         if (r->nodeType == NodeType::IntLiteral)
         {
-            FloatNode* result = new FloatNode();
+            IntNode* result = new IntNode();
             result->value = static_cast<FloatNode*>(l)->value < static_cast<IntNode*>(r)->value;
             return result;
         }
         else
         {
-            FloatNode* result = new FloatNode();
+            IntNode* result = new IntNode();
             result->value = static_cast<FloatNode*>(l)->value < static_cast<FloatNode*>(r)->value;
             return result;
         }
@@ -67,7 +96,7 @@ Node* Library::Nand(const std::vector<Node*>& args, Interpreter* interpreter)
         }
         else
         {
-            FloatNode* result = new FloatNode();
+            IntNode* result = new IntNode();
             result->value = !static_cast<IntNode*>(l)->value || !static_cast<FloatNode*>(r)->value;
             return result;
         }
@@ -76,13 +105,13 @@ Node* Library::Nand(const std::vector<Node*>& args, Interpreter* interpreter)
     {
         if (r->nodeType == NodeType::IntLiteral)
         {
-            FloatNode* result = new FloatNode();
+            IntNode* result = new IntNode();
             result->value = !static_cast<FloatNode*>(l)->value || !static_cast<IntNode*>(r)->value;
             return result;
         }
         else
         {
-            FloatNode* result = new FloatNode();
+            IntNode* result = new IntNode();
             result->value = !static_cast<FloatNode*>(l)->value || !static_cast<FloatNode*>(r)->value;
             return result;
         }
@@ -113,16 +142,13 @@ Node* Library::Length(const std::vector<Node*>& args, Interpreter* interpreter)
         else
             node->value += static_cast<ListLiteral*>(list)->elements.size();
     }
-    std::cout << "Length: " << node->value << std::endl;
     return node;
 }
 
 Node* Library::Head(const std::vector<Node*>& args, Interpreter* interpreter)
 {
     assert(args.size() == 1);
-    std::cout << "Head: " << args[0]->nodeType << std::endl;
     ListNode* listNode = static_cast<ListNode*>(interpreter->Evaluate(args[0]));
-    Parser::PrintNode(listNode);
 
     ::List* list = listNode->lists.front();
     if (list->listType == ListType::LiteralList)
@@ -164,7 +190,6 @@ Node* Library::List(const std::vector<Node*>& args, Interpreter* interpreter)
 {    
     if (args.size() == 1)
     {
-        std::cout << 1;
         double startValue = static_cast<FloatNode*>(interpreter->Evaluate(args[0]))->value;
         FunctionalList* list = new FunctionalList();
         list->startValue = startValue;
@@ -177,7 +202,6 @@ Node* Library::List(const std::vector<Node*>& args, Interpreter* interpreter)
     }
     else if (args.size() == 2)
     {
-        std::cout << 2;
         double startValue = static_cast<FloatNode*>(interpreter->Evaluate(args[0]))->value;
         double step = static_cast<FloatNode*>(interpreter->Evaluate((args[1])))->value;
         FunctionalList* list = new FunctionalList();
@@ -211,11 +235,6 @@ Node* Library::Concat(const std::vector<Node*>& args, Interpreter* interpreter)
     assert(args.size() == 2);
     ListNode* l1 = static_cast<ListNode*>(interpreter->Evaluate(args[0]));
     ListNode* l2 = static_cast<ListNode*>(interpreter->Evaluate(args[1]));
-    std::cout << "Concat: ";
-    Parser::PrintNode(l1);
-    std::cout << " ";
-    Parser::PrintNode(l2);
-    std::cout << std::endl;
     
     ListNode* result = static_cast<ListNode*>(l1->Clone());
     for (::List* list : l2->lists)
@@ -225,20 +244,13 @@ Node* Library::Concat(const std::vector<Node*>& args, Interpreter* interpreter)
 
 Node* Library::If(const std::vector<Node*>& args, Interpreter* interpreter)
 {
-    // std::cout << "If" << std::endl;
-    // std::cout << args[0]->nodeType << std::endl;
-    // Parser::PrintNode(args[0]);
     IntNode* condition = static_cast<IntNode*>(interpreter->Evaluate(args[0]));
     if (condition->value)
     {
-        // std::cout << "True: " << condition->value << std::endl;
         Node* node = interpreter->Evaluate(args[1]);
-        // std::cout << node->nodeType << std::endl;
         return node;
     }
-    // std::cout << "False: " << condition->value << std::endl;
     Node* node = interpreter->Evaluate(args[2]);
-    // std::cout << node->nodeType << std::endl;
     return node;
 }
 
@@ -253,8 +265,6 @@ Node* Library::Read(const std::vector<Node*>& args, Interpreter* interpreter)
 
 Node* Library::WriteLn(const std::vector<Node*>& args, Interpreter* interpreter)
 {
-    if (args.size() > 0)
-    // Parser::PrintNode(args[0]);
     Write(args, interpreter);
     std::cout << std::endl;
     return nullptr;

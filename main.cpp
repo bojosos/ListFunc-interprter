@@ -14,15 +14,13 @@ int main ()
     in.read(&file[0], pos);
     in.close();
 
-    std::cout << file << std::endl;
     Parser parser;
     ProgramNode* program = parser.ParseProgram(file);
-    std::cout << "Parsed" << std::endl;
-    Parser::PrintAst(program);
-    // exit(0);
+    // std::cout << "Parsed" << std::endl;
+    // Parser::PrintAst(program);
     Interpreter interpreter;
     interpreter.Evaluate(program);
-    std::cout << "Done" << std::endl;
+    // std::cout << "Done" << std::endl;
 
     return 0;
 }

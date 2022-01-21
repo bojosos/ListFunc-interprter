@@ -46,6 +46,7 @@ enum class ListType
 };
 
 class FunctionDecl;
+class ModuleNode;
 
 struct Node
 {
@@ -67,6 +68,7 @@ struct ProgramNode : public Node
         return newNode;
     }
 
+    std::vector<ModuleNode*> modules;
     std::vector<FunctionDecl*> functionDeclarations; // so that function decls can be used in the whole file
     std::vector<Node*> nodes; // other nodes (expressions)
 };
@@ -202,7 +204,15 @@ struct FunctionDecl : public Node
 struct ModuleNode : public Node
 {
     ModuleNode() : Node(NodeType::Module) { }
+
     std::string moduleName;
+    ProgramNode* moduleNode;
+
+    virtual Node* Clone() const override
+    {
+        assert(false);
+    }
+
 };
 
 class Interpreter
