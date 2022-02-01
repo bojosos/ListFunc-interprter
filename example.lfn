@@ -1,0 +1,16 @@
+#library
+
+filterPrimes -> if(length(#0), if(
+    int(isPrime(head(#0), int(2))),
+    call(write(head(#0), " "), filterPrimes(tail(#0))),
+    filterPrimes(tail(#0))), []
+)
+
+fn -> concat([head(#0)], #1)
+
+somePrimes -> filterPrimes(cons(2, list(3, 2, 100)))
+writeln(somePrimes())
+
+writeln(insertionSort(concat([51 6 1 9 5], list(1,2,10))))
+
+writeln(elem(1, list(1,1,5)))

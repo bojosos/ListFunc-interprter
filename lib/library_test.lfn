@@ -1,0 +1,135 @@
+#library
+
+require(1)
+
+require(eq(1, 1))
+require(not(eq(0, 1)))
+
+require(not(0))
+require(not(not(1)))
+
+require(not(eq(5, 1)))
+require(not(eq(1.2, 1)))
+
+require(le(1, 2))
+require(not(le(2, 2)))
+require(le(1.4, 1.6))
+require(le(2, 2.8))
+
+require(less(1, 2))
+require(not(less(2, 2)))
+require(less(1.4, 1.6))
+require(less(2, 2.8))
+
+require(eq(nand(1, 1), 0))
+require(eq(nand(1, 0), 1))
+require(eq(nand(0, 1), 1))
+require(eq(nand(0, 0), 1))
+
+require(eq(xor(1, 1), 0))
+require(eq(xor(1, 0), 1))
+require(eq(xor(0, 1), 1))
+require(eq(xor(0, 0), 0))
+
+require(eq(and(1, 1), 1))
+require(eq(and(1, 0), 0))
+require(eq(and(0, 1), 0))
+require(eq(and(0, 0), 0))
+
+require(eq(or(1, 1), 1))
+require(eq(or(1, 0), 1))
+require(eq(or(0, 1), 1))
+require(eq(or(0, 0), 0))
+
+require(eq(nor(1, 1), 0))
+require(eq(nor(1, 0), 0))
+require(eq(nor(0, 1), 0))
+require(eq(nor(0, 0), 1))
+
+require(eq(add(1, 2), 3))
+require(eq(add(3.2, 4), 7.2))
+require(eq(add(3.0, 4.0), 7.0))
+require(eq(add(0, 1.0), 1.0))
+require(eq(add(0, -1), -1))
+
+require(eq(add(1, 2, 3, 4, 5, 6), sum(list(1, 1, 6))))
+require(eq(div(6, 1, 1, 1, 1, 1, 3), 2))
+require(eq(mul(2, 2, 2, 2, 2, 2), 64))
+require(eq(sub(6, 1, 1, 1, 1, 1), 1))
+
+require(eq(1, 1, 1, 1, 1))
+require(not(eq(1, 0, 1, 1, 1)))
+require(eq(2, 2, 2, 2, 2))
+
+require(not(le(2,1)))
+require(le(1,2,3,4,5,6,7,8))
+require(not(le(1,2,3,4,5,6,7,7)))
+require(not(le(1,2,1)))
+
+require(eq(sub(1, -2), 3))
+require(eq(sub(4, 2.0), 2.0))
+require(eq(sub(3, 4), -1))
+
+require(eq(sqrt(4), 2))
+require(eq(sqrt(1.0), 1))
+require(eq(int(sqrt(2.0)), 1))
+
+require(eq(sqrt(1.0), 1))
+require(eq(sqrt(1.0), 1))
+require(eq(sqrt(1.0), 1))
+
+require(eq(length([]), 0))
+require(eq(length([1 2 3 4 5 6]), 6))
+require(eq(length(list(1, 2, 3)), 3))
+
+require(eqList([], []))
+require(eqList([1 3 5], list(1, 2, 3)))
+require(eqList(list(1, 2, 3), list(1, 2, 3)))
+require(eqList([1 2 3 4 5], [1 2 3 4 5]))
+require(eqList(list(1, 2, 3), list(1, 2, 3)))
+require(not(eqList([1 2 3 4 5], [1 2 3 5])))
+require(not(eqList([1 2 3 4 5], [1 2 3 4 6])))
+
+require(eqList(cons(1, [1 2 3]), [1 1 2 3]))
+
+require(eq(head([1 2 3 4 5 6]), 1))
+require(eqList(tail([1 2 3 4 5 6]), [2 3 4 5 6]))
+require(eq(head(tail([1 2 3 4 5 6])), 2))
+require(eqList(concat([1 2 3 4], [1 2 3 4 5]), [1 2 3 4 1 2 3 4 5]))
+require(eqList(concat([1 2 3 4], list(1, 2, 3)), [1 2 3 4 1 3 5]))
+
+require(eq(int(6.0), 6))
+require(eq(int(5), 5))
+require(eq(int(4.3), 4))
+
+require(if (1, 1, 0))
+require(if (0, 0, 1))
+
+require(eqList(take(0, []), []))
+require(eqList(take(1, []), []))
+require(eqList(take(1, [1 2 3]), [1]))
+require(eqList(take(3, [1 2 3]), [1 2 3]))
+
+require(eq(sum([1 2 3]), 6))
+require(eq(sum([]), 0))
+
+require(not(isPrime(1)))
+require(isPrime(2))
+require(isPrime(3))
+require(not(isPrime(4)))
+require(isPrime(5))
+require(isPrime(7))
+
+require(elem(1, [1 2 3]))
+require(not(elem(5, [1 2 3])))
+
+require(even(2))
+require(not(even(3)))
+require(odd(3))
+require(not(odd(4)))
+
+require(eqList(insertionSort([]), []))
+require(eqList(insertionSort([5 4 3 2 1]), [1 2 3 4 5]))
+
+require(eq(mod(2, 2), 0))
+require(eq(mod(2, 3), 2))

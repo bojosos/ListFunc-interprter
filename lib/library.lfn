@@ -1,0 +1,86 @@
+/ logical not
+not -> nand(#0, 1)
+
+/ logical and
+and -> not(nand(#0, #1))
+
+/ logical or
+or -> nand(nand(#0, #0), nand(#1, #1))
+
+/ logical nor
+nor -> nand(or(#0, #1), or(#0, #1))
+
+/ logical xor
+xor -> nand(nand(nand(#0, #1), #0), nand(nand(#0, #1), #1))
+
+/ check if #0 == 0
+zero -> eq(#0, 0)
+
+/ alias for le
+less -> le(#0, #1)
+
+/ check if #0 <= #1
+leq -> or(less(#0, #1), eq(#0, #1))
+
+/ check if #1 is even
+even -> not(mod(int(#0), int(2)))
+
+/ check if #0 is odd
+odd -> not(even(#0))
+
+/ check if #0 >= #1
+geq -> not(le(#0, #1))
+
+/ check if #0 > #1
+gr -> and(geq(#0, #1), not(eq(#0, #1)))
+
+/ alias for gr
+greater -> gr(#0, #1)
+
+/ alias for eq
+equals -> eq(#0, #1)
+
+/ check if a list is empty
+empty -> not(length(#0))
+
+/ check if element is in list
+elem -> if(empty(#1), 0, or(eq(#0, head(#1)), elem(#0, tail(#1))))
+
+/ sum elements of a list
+sum -> if(empty(#0), 0, add(head(#0), sum(tail(#0))))
+
+/ take first #0 elements from #1
+take -> if (not(#0), [], if (empty(#1), [],
+    cons(head(#1), take(sub(#0, 1), tail(#1)))
+))
+
+/ add element to front of list
+cons -> concat([#0], #1)
+
+/ insertion sort
+insertionSort -> if (empty(#0), [], _insert(head(#0), insertionSort(tail(#0))))
+_insert -> if(empty(#1),
+             [#0],
+                if(leq(#0, head(#1)),
+                    cons(#0, #1),
+                    cons(head(#1), _insert(#0, tail(#1)))
+                )
+)
+
+_isPrime -> if(eq(#0, 1), 0, if(
+    le(#0, mul(#1, #1)),
+    1,
+    if (not(mod(int(#0), int(#1))),
+        0,
+        _isPrime(#0, add(#1, 1))
+    ))
+)
+
+/check if #0 is prime
+isPrime -> _isPrime(int(#0), int(2))
+
+/ infinite list of natural numbers
+nats -> list(1)
+
+/ function for comparing lists
+eqList -> if(length(#0), if (length(#1), if (eq(head(#0), head(#1)), eqList(tail(#0), tail(#1)), 0), 0), if (length(#1), 0, 1))
