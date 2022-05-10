@@ -1,3 +1,5 @@
+[Описание на езика](https://docs.google.com/document/d/1zvtnmx2HZLKyumsui2q_qN4-6jgjHYZClLZhqggEmEA/edit#heading=h.tk6k4ue0s8zh).
+
 Инструкции за генериране на проект
 
 В главната директория на проекта
